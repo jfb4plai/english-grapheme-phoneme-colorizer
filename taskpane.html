@@ -4,513 +4,454 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>English Grapheme-Phoneme Colorizer</title>
+    <title>Grapheme-Phoneme Colorizer</title>
     
     <!-- Office JavaScript API -->
     <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
     
     <style>
         body {
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            background-color: #f5f7fa;
         }
         
         .container {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            max-width: 400px;
+            max-width: 600px;
             margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
         }
         
         h1 {
             color: #2c3e50;
-            margin-bottom: 5px;
-            font-size: 1.8em;
             text-align: center;
+            margin-bottom: 10px;
+            font-size: 24px;
         }
         
         .subtitle {
             text-align: center;
             color: #7f8c8d;
-            margin-bottom: 20px;
-            font-size: 0.9em;
+            margin-bottom: 25px;
+            font-style: italic;
         }
         
-        .control-group {
-            margin-bottom: 15px;
+        .control-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #e3f2fd;
+            border-radius: 8px;
+            background-color: #fafafa;
         }
         
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #2c3e50;
-            font-size: 0.9em;
+        .control-title {
+            font-weight: bold;
+            color: #1976d2;
+            margin-bottom: 10px;
+            font-size: 16px;
         }
         
-        select, button {
+        select {
             width: 100%;
-            padding: 10px;
-            border: 2px solid #e0e0e0;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
             border-radius: 6px;
+            background-color: white;
             font-size: 14px;
-            transition: border-color 0.3s;
-        }
-        
-        select:focus {
-            outline: none;
-            border-color: #667eea;
+            margin-bottom: 10px;
         }
         
         button {
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background-color: #6c5ce7;
             color: white;
+            padding: 12px 20px;
             border: none;
+            border-radius: 25px;
             cursor: pointer;
-            font-weight: 600;
-            margin-bottom: 10px;
-            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 14px;
+            margin: 5px;
+            min-width: 120px;
+            transition: all 0.3s ease;
         }
         
         button:hover {
+            background-color: #5a4fcf;
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
         
-        button:active {
-            transform: translateY(0);
+        button.clear-btn {
+            background-color: #fd79a8;
         }
         
-        .button-group {
+        button.clear-btn:hover {
+            background-color: #e84393;
+        }
+        
+        button.analyze-btn {
+            background-color: #00b894;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        button.analyze-btn:hover {
+            background-color: #00a085;
+        }
+        
+        .button-row {
             display: flex;
             gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
         
-        .button-group button {
-            flex: 1;
-            margin-bottom: 0;
-        }
-        
-        .legend {
+        .color-legend {
             margin-top: 20px;
             padding: 15px;
             background: #f8f9fa;
             border-radius: 8px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #6c5ce7;
         }
         
-        .legend h3 {
-            margin-top: 0;
-            margin-bottom: 10px;
+        .legend-title {
+            font-weight: bold;
             color: #2c3e50;
-            font-size: 1em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 8px;
         }
         
         .legend-item {
-            display: inline-block;
-            margin: 3px 5px 3px 0;
-            padding: 3px 6px;
-            border-radius: 3px;
-            font-size: 11px;
-            font-weight: 500;
-        }
-        
-        .status {
-            margin-top: 15px;
-            padding: 10px;
-            background: #e3f2fd;
-            border-radius: 6px;
+            padding: 6px 10px;
+            border-radius: 15px;
+            text-align: center;
             font-size: 12px;
-            color: #1565c0;
+            font-weight: 500;
+            color: white;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+        }
+        
+        .notice {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 15px 0;
+            color: #856404;
             text-align: center;
+            font-size: 13px;
         }
         
-        .error {
-            background: #ffebee;
-            color: #c62828;
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #b3d7ff;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 15px 0;
+            color: #0c5460;
+            font-size: 13px;
         }
         
-        .success {
-            background: #e8f5e8;
-            color: #2e7d32;
+        .status-message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
         }
         
-        /* Couleurs pour correspondances graphème-phonème */
-        .vowel-simple { background-color: #ffcccb !important; color: #8b0000 !important; }
-        .vowel-complex { background-color: #ffd700 !important; color: #b8860b !important; }
-        .consonant-simple { background-color: #add8e6 !important; color: #00008b !important; }
-        .consonant-complex { background-color: #90ee90 !important; color: #006400 !important; }
-        .silent { background-color: #d3d3d3 !important; color: #696969 !important; }
-        .irregular { background-color: #dda0dd !important; color: #800080 !important; }
-        .morpheme { background-color: #f0e68c !important; color: #9acd32 !important; }
-        
-        .about {
-            margin-top: 20px;
-            font-size: 11px;
-            color: #666;
-            text-align: center;
-            line-height: 1.4;
-        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info-msg { background: #d1ecf1; color: #0c5460; border: 1px solid #b3d7ff; }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>🎨 Grapheme-Phoneme</h1>
+        <h1>🧠 Grapheme-Phoneme</h1>
         <p class="subtitle">Visualizing English sound-spelling correspondences</p>
         
-        <div class="control-group">
-            <label for="colorMode">Coloring Strategy:</label>
-            <select id="colorMode">
+        <div class="control-section">
+            <div class="control-title">Coloring Strategy:</div>
+            <select id="coloringStrategy">
                 <option value="phoneme">Phoneme-based</option>
-                <option value="complexity">Complexity-based</option>
-                <option value="syllable">Syllable-based</option>
-                <option value="morpheme">Morpheme-based</option>
+                <option value="grapheme">Grapheme-based</option>
+                <option value="difficulty">Difficulty-based</option>
             </select>
         </div>
         
-        <div class="control-group">
-            <label for="targetText">Apply to:</label>
-            <select id="targetText">
+        <div class="control-section">
+            <div class="control-title">Apply to:</div>
+            <select id="applyTo">
                 <option value="selection">Selected text</option>
                 <option value="paragraph">Current paragraph</option>
                 <option value="document">Entire document</option>
             </select>
         </div>
         
-        <div class="button-group">
-            <button onclick="colorizeText()">🎨 Colorize</button>
-            <button onclick="clearFormatting()">🗑️ Clear</button>
+        <div class="button-row">
+            <button id="colorizeBtn" onclick="colorizeText()">🎨 Colorize</button>
+            <button class="clear-btn" id="clearBtn" onclick="clearFormatting()">🗑️ Clear</button>
         </div>
         
-        <button onclick="analyzeDifficulty()">📊 Analyze Difficulty</button>
+        <button class="analyze-btn" id="analyzeBtn" onclick="analyzeDifficulty()">📊 Analyze Difficulty</button>
         
-        <div class="legend">
-            <h3>📚 Color Legend</h3>
-            <span class="legend-item vowel-simple">Simple Vowels</span>
-            <span class="legend-item vowel-complex">Complex Vowels</span>
-            <span class="legend-item consonant-simple">Simple Consonants</span>
-            <span class="legend-item consonant-complex">Complex Consonants</span>
-            <span class="legend-item silent">Silent Letters</span>
-            <span class="legend-item irregular">Irregular</span>
-            <span class="legend-item morpheme">Morphemes</span>
+        <div class="color-legend">
+            <div class="legend-title">
+                📚 Color Legend
+            </div>
+            <div class="legend-grid">
+                <div class="legend-item" style="background-color: #FF6B6B;">Simple Vowels</div>
+                <div class="legend-item" style="background-color: #FFD93D;">Complex Vowels</div>
+                <div class="legend-item" style="background-color: #6BCF7F;">Simple Consonants</div>
+                <div class="legend-item" style="background-color: #4D96FF;">Complex Consonants</div>
+                <div class="legend-item" style="background-color: #9B59B6;">Silent Letters</div>
+                <div class="legend-item" style="background-color: #E17055;">Irregular</div>
+                <div class="legend-item" style="background-color: #F39C12;">Morphemes</div>
+            </div>
         </div>
         
-        <div id="status" class="status">Ready to colorize text...</div>
+        <div class="notice">
+            ⚠️ This add-in works best in Microsoft Word
+        </div>
         
-        <div class="about">
+        <div class="info">
             <strong>For Dyslexia Support:</strong><br>
             This tool helps visualize grapheme-phoneme correspondences to aid in understanding the relationship between written letters and their sounds.
         </div>
+        
+        <div id="statusArea"></div>
     </div>
 
     <script>
-        // CMU Dictionary Sample (en réalité, cela serait chargé depuis une API ou fichier)
-        const cmuDict = {
-            "THE": "DH AH0", "CAT": "K AE1 T", "SAT": "S AE1 T", "ON": "AA1 N", "MAT": "M AE1 T",
-            "READING": "R IY1 D IH0 NG", "THROUGH": "TH R UW1", "TOUGH": "T AH1 F",
-            "ENOUGH": "IH0 N AH1 F", "WORDS": "W ER1 D Z", "CAN": "K AE1 N", "BE": "B IY1",
-            "BEAUTIFUL": "B Y UW1 T AH0 F AH0 L", "WHEN": "W EH1 N", "YOU": "Y UW1",
-            "UNDERSTAND": "AH2 N D ER0 S T AE1 N D", "PHONEME": "F OW1 N IY0 M",
-            "VISUALIZATION": "V IH2 ZH UW0 AH0 L AH0 Z EY1 SH AH0 N", "SYSTEMS": "S IH1 S T AH0 M Z",
-            "HELP": "HH EH1 L P", "LEARN": "L ER1 N", "SPELL": "S P EH1 L", "READ": "R IY1 D",
-            "WRITE": "R AY1 T", "SOUND": "S AW1 N D", "LETTER": "L EH1 T ER0"
+        // Global variables
+        let isInWord = false;
+        
+        // Grapheme color mapping
+        const colorMap = {
+            vowels: '#FF6B6B',
+            consonants: '#4ECDC4',
+            digraphs: '#6C5CE7',
+            trigraphs: '#E17055',
+            silent: '#95A5A6'
         };
-        
-        // Patterns graphème-phonème
-        const graphemePatterns = {
-            "ea": { phonemes: ["IY1", "EH1"], type: "vowel-complex" },
-            "ou": { phonemes: ["AW1", "UW1"], type: "vowel-complex" },
-            "ough": { phonemes: ["AW1", "OW1", "AH1"], type: "irregular" },
-            "th": { phonemes: ["TH", "DH"], type: "consonant-complex" },
-            "ch": { phonemes: ["CH", "K", "SH"], type: "consonant-complex" },
-            "ph": { phonemes: ["F"], type: "consonant-complex" },
-            "gh": { phonemes: ["F", "G", ""], type: "irregular" },
-            "tion": { phonemes: ["SH AH0 N"], type: "morpheme" },
-            "sion": { phonemes: ["ZH AH0 N"], type: "morpheme" },
-            "ed": { phonemes: ["T", "D", "IH0 D"], type: "morpheme" },
-            "ing": { phonemes: ["IH0 NG"], type: "morpheme" },
-            "ly": { phonemes: ["L IY0"], type: "morpheme" }
-        };
-        
-        let statusDiv;
-        
-        Office.onReady((info) => {
-            statusDiv = document.getElementById('status');
-            if (info.host === Office.HostType.Word) {
-                updateStatus("✅ Connected to Word. Ready to colorize!", "success");
-            } else {
-                updateStatus("⚠️ This add-in works best in Microsoft Word", "error");
-            }
-        });
-        
-        function updateStatus(message, type = "") {
-            statusDiv.textContent = message;
-            statusDiv.className = `status ${type}`;
-        }
-        
-        function analyzeWord(word) {
-            const wordUpper = word.toUpperCase();
-            const phonemes = cmuDict[wordUpper] || "";
-            
-            let analysis = [];
-            let i = 0;
-            
-            while (i < word.length) {
-                let matched = false;
+
+        // Initialize Office Add-in
+        if (typeof Office !== 'undefined') {
+            Office.onReady(function(info) {
+                console.log('Office.js initialized');
                 
-                // Chercher patterns complexes
-                for (let len = Math.min(4, word.length - i); len >= 2; len--) {
-                    const substr = word.substring(i, i + len).toLowerCase();
-                    if (graphemePatterns[substr]) {
-                        analysis.push({
-                            text: word.substring(i, i + len),
-                            type: graphemePatterns[substr].type,
-                            phonemes: graphemePatterns[substr].phonemes
-                        });
-                        i += len;
-                        matched = true;
-                        break;
-                    }
+                if (info.host === Office.HostType.Word) {
+                    console.log('Word environment detected');
+                    isInWord = true;
+                    showMessage('Connected to Microsoft Word', 'success');
+                } else {
+                    console.log('Non-Word environment');
+                    showMessage('Running in demo mode - install in Word for full functionality', 'warning');
                 }
-                
-                // Lettre simple
-                if (!matched) {
-                    const char = word[i].toLowerCase();
-                    let type = "consonant-simple";
+            });
+        } else {
+            console.log('Office.js not available - demo mode');
+            showMessage('Office.js not available - running in browser demo mode', 'info-msg');
+        }
+
+        // Colorize text function
+        function colorizeText() {
+            console.log('Colorize function called');
+            
+            if (!isInWord) {
+                showMessage('Demo: Colorization would apply grapheme-phoneme patterns', 'info-msg');
+                return;
+            }
+
+            Word.run(function(context) {
+                try {
+                    const applyTo = document.getElementById('applyTo').value;
+                    let range;
                     
-                    if ("aeiou".includes(char)) {
-                        type = "vowel-simple";
+                    if (applyTo === 'selection') {
+                        range = context.document.getSelection();
+                    } else if (applyTo === 'paragraph') {
+                        range = context.document.getSelection().paragraphs.getFirst();
+                    } else {
+                        range = context.document.body;
                     }
                     
-                    // Détecter lettres muettes
-                    if (isLikelySilent(word, i)) {
-                        type = "silent";
-                    }
+                    range.load('text');
                     
-                    analysis.push({
-                        text: word[i],
-                        type: type,
-                        phonemes: []
+                    return context.sync().then(function() {
+                        const text = range.text;
+                        console.log('Text to colorize:', text);
+                        
+                        if (!text || text.trim() === '') {
+                            showMessage('No text found to colorize', 'warning');
+                            return context.sync();
+                        }
+                        
+                        // Apply basic colorization
+                        return applyBasicColorization(range, text, context);
                     });
-                    i++;
-                }
-            }
-            
-            return { analysis, fullPhonemes: phonemes };
-        }
-        
-        function isLikelySilent(word, position) {
-            const char = word[position].toLowerCase();
-            
-            // 'e' muet en fin de mot
-            if (char === 'e' && position === word.length - 1 && word.length > 2) {
-                const prevChar = word[position - 1].toLowerCase();
-                if (!"aeiou".includes(prevChar)) {
-                    return true;
-                }
-            }
-            
-            // 'b' muet après 'm'
-            if (char === 'b' && position > 0 && word[position - 1].toLowerCase() === 'm' && 
-                position === word.length - 1) {
-                return true;
-            }
-            
-            return false;
-        }
-        
-        async function colorizeText() {
-            updateStatus("🎨 Analyzing and colorizing text...");
-            
-            try {
-                await Word.run(async (context) => {
-                    const targetText = document.getElementById('targetText').value;
-                    const colorMode = document.getElementById('colorMode').value;
                     
+                } catch (error) {
+                    console.error('Error in colorizeText:', error);
+                    showMessage('Error applying colorization: ' + error.message, 'error');
+                }
+            }).catch(function(error) {
+                console.error('Word.run error:', error);
+                showMessage('Word API error: ' + error.message, 'error');
+            });
+        }
+
+        // Clear formatting function
+        function clearFormatting() {
+            console.log('Clear formatting called');
+            
+            if (!isInWord) {
+                showMessage('Demo: Would clear all color formatting', 'info-msg');
+                return;
+            }
+
+            Word.run(function(context) {
+                try {
+                    const applyTo = document.getElementById('applyTo').value;
                     let range;
                     
-                    // Déterminer la portée du texte
-                    switch (targetText) {
-                        case 'selection':
-                            range = context.document.getSelection();
-                            break;
-                        case 'paragraph':
-                            range = context.document.getSelection().paragraphs.getFirst().getRange();
-                            break;
-                        case 'document':
-                            range = context.document.body;
-                            break;
+                    if (applyTo === 'selection') {
+                        range = context.document.getSelection();
+                    } else if (applyTo === 'paragraph') {
+                        range = context.document.getSelection().paragraphs.getFirst();
+                    } else {
+                        range = context.document.body;
                     }
                     
-                    // Charger le texte
-                    context.load(range, 'text');
-                    await context.sync();
+                    range.load('text');
                     
-                    const text = range.text;
-                    if (!text.trim()) {
-                        updateStatus("⚠️ No text found to colorize", "error");
-                        return;
-                    }
-                    
-                    // Effacer le formatage existant
-                    range.clear(Word.ClearApplyTo.formatting);
-                    
-                    // Analyser et appliquer la colorisation
-                    const words = text.match(/\b\w+\b/g) || [];
-                    let wordsProcessed = 0;
-                    let complexPatterns = 0;
-                    
-                    for (const word of words) {
-                        const analysis = analyzeWord(word);
-                        
-                        // Trouver toutes les occurrences du mot
-                        const searchResults = range.search(word, { matchCase: false, matchWholeWord: true });
-                        context.load(searchResults, 'items');
-                        await context.sync();
-                        
-                        // Appliquer la colorisation à chaque occurrence
-                        for (let i = 0; i < searchResults.items.length; i++) {
-                            const wordRange = searchResults.items[i];
-                            let charIndex = 0;
-                            
-                            for (const segment of analysis.analysis) {
-                                const segmentRange = wordRange.getRange().characters;
-                                const segmentText = segmentRange.items.slice(charIndex, charIndex + segment.text.length);
-                                
-                                // Appliquer la couleur
-                                const color = getColorForType(segment.type);
-                                for (const charRange of segmentText) {
-                                    charRange.font.highlightColor = color.bg;
-                                    charRange.font.color = color.fg;
-                                }
-                                
-                                charIndex += segment.text.length;
-                                
-                                if (segment.type.includes('complex') || segment.type === 'irregular') {
-                                    complexPatterns++;
-                                }
-                            }
+                    return context.sync().then(function() {
+                        if (!range.text || range.text.trim() === '') {
+                            showMessage('No text found to clear', 'warning');
+                            return context.sync();
                         }
                         
-                        wordsProcessed++;
-                    }
-                    
-                    await context.sync();
-                    
-                    const complexityRate = wordsProcessed > 0 ? (complexPatterns / wordsProcessed * 100).toFixed(1) : 0;
-                    updateStatus(`✅ Colorized ${wordsProcessed} words. Complexity: ${complexityRate}%`, "success");
-                });
-            } catch (error) {
-                console.error(error);
-                updateStatus(`❌ Error: ${error.message}`, "error");
-            }
-        }
-        
-        function getColorForType(type) {
-            const colors = {
-                "vowel-simple": { bg: "#ffcccb", fg: "#8b0000" },
-                "vowel-complex": { bg: "#ffd700", fg: "#b8860b" },
-                "consonant-simple": { bg: "#add8e6", fg: "#00008b" },
-                "consonant-complex": { bg: "#90ee90", fg: "#006400" },
-                "silent": { bg: "#d3d3d3", fg: "#696969" },
-                "irregular": { bg: "#dda0dd", fg: "#800080" },
-                "morpheme": { bg: "#f0e68c", fg: "#9acd32" }
-            };
-            
-            return colors[type] || { bg: "#ffffff", fg: "#000000" };
-        }
-        
-        async function clearFormatting() {
-            updateStatus("🗑️ Clearing formatting...");
-            
-            try {
-                await Word.run(async (context) => {
-                    const targetText = document.getElementById('targetText').value;
-                    
-                    let range;
-                    switch (targetText) {
-                        case 'selection':
-                            range = context.document.getSelection();
-                            break;
-                        case 'paragraph':
-                            range = context.document.getSelection().paragraphs.getFirst().getRange();
-                            break;
-                        case 'document':
-                            range = context.document.body;
-                            break;
-                    }
-                    
-                    range.clear(Word.ClearApplyTo.formatting);
-                    await context.sync();
-                    
-                    updateStatus("✅ Formatting cleared", "success");
-                });
-            } catch (error) {
-                updateStatus(`❌ Error: ${error.message}`, "error");
-            }
-        }
-        
-        async function analyzeDifficulty() {
-            updateStatus("📊 Analyzing reading difficulty...");
-            
-            try {
-                await Word.run(async (context) => {
-                    const range = context.document.getSelection();
-                    context.load(range, 'text');
-                    await context.sync();
-                    
-                    const text = range.text;
-                    if (!text.trim()) {
-                        updateStatus("⚠️ Please select text to analyze", "error");
-                        return;
-                    }
-                    
-                    const words = text.match(/\b\w+\b/g) || [];
-                    let totalWords = words.length;
-                    let complexWords = 0;
-                    let irregularWords = 0;
-                    let totalGraphemes = 0;
-                    
-                    for (const word of words) {
-                        const analysis = analyzeWord(word);
-                        totalGraphemes += analysis.analysis.length;
+                        // Clear font formatting
+                        range.font.color = '#000000';
+                        range.font.bold = false;
                         
-                        let hasComplex = false;
-                        let hasIrregular = false;
+                        return context.sync().then(function() {
+                            showMessage('Formatting cleared successfully', 'success');
+                        });
+                    });
+                    
+                } catch (error) {
+                    console.error('Error in clearFormatting:', error);
+                    showMessage('Error clearing formatting: ' + error.message, 'error');
+                }
+            }).catch(function(error) {
+                console.error('Word.run error in clearFormatting:', error);
+                showMessage('Word API error: ' + error.message, 'error');
+            });
+        }
+
+        // Apply basic colorization
+        function applyBasicColorization(range, text, context) {
+            console.log('Applying basic colorization');
+            
+            // Determine primary grapheme type
+            let color = colorMap.consonants; // default
+            
+            if (/[aeiouAEIOU]/.test(text)) {
+                color = colorMap.vowels;
+            }
+            
+            if (/th|ch|sh|wh|ph|gh/i.test(text)) {
+                color = colorMap.digraphs;
+                range.font.bold = true;
+            }
+            
+            // Apply the color
+            range.font.color = color;
+            
+            return context.sync().then(function() {
+                showMessage('Colorization applied successfully', 'success');
+                console.log('Colorization completed');
+            });
+        }
+
+        // Analyze difficulty function
+        function analyzeDifficulty() {
+            console.log('Analyze difficulty called');
+            
+            if (!isInWord) {
+                showMessage('Demo: Would analyze text difficulty and suggest improvements', 'info-msg');
+                return;
+            }
+
+            Word.run(function(context) {
+                try {
+                    const selection = context.document.getSelection();
+                    selection.load('text');
+                    
+                    return context.sync().then(function() {
+                        const text = selection.text;
                         
-                        for (const segment of analysis.analysis) {
-                            if (segment.type.includes('complex')) {
-                                hasComplex = true;
-                            }
-                            if (segment.type === 'irregular') {
-                                hasIrregular = true;
-                            }
+                        if (!text || text.trim() === '') {
+                            showMessage('Please select text to analyze', 'warning');
+                            return;
                         }
                         
-                        if (hasComplex) complexWords++;
-                        if (hasIrregular) irregularWords++;
-                    }
+                        // Simple analysis
+                        const wordCount = text.split(/\s+/).length;
+                        const hasDigraphs = /th|ch|sh|wh|ph|gh/i.test(text);
+                        const hasComplexVowels = /ai|ay|ea|ee|ie|oa|oo|ou|ow|ue/i.test(text);
+                        
+                        let difficulty = 'Easy';
+                        if (hasDigraphs && hasComplexVowels) {
+                            difficulty = 'Hard';
+                        } else if (hasDigraphs || hasComplexVowels) {
+                            difficulty = 'Medium';
+                        }
+                        
+                        showMessage(`Analysis: ${wordCount} words, Difficulty: ${difficulty}`, 'info-msg');
+                    });
                     
-                    const complexityRate = totalWords > 0 ? (complexWords / totalWords * 100).toFixed(1) : 0;
-                    const irregularityRate = totalWords > 0 ? (irregularWords / totalWords * 100).toFixed(1) : 0;
-                    
-                    let difficultyLevel = "Easy";
-                    if (complexityRate > 40) difficultyLevel = "Very Hard";
-                    else if (complexityRate > 25) difficultyLevel = "Hard";
-                    else if (complexityRate > 15) difficultyLevel = "Medium";
-                    
-                    updateStatus(`📊 ${totalWords} words, ${complexityRate}% complex, ${irregularityRate}% irregular. Level: ${difficultyLevel}`, "");
-                });
-            } catch (error) {
-                updateStatus(`❌ Error: ${error.message}`, "error");
-            }
+                } catch (error) {
+                    console.error('Error in analyzeDifficulty:', error);
+                    showMessage('Error analyzing text: ' + error.message, 'error');
+                }
+            }).catch(function(error) {
+                console.error('Word.run error in analyzeDifficulty:', error);
+            });
         }
+
+        // Show status message
+        function showMessage(message, type) {
+            const statusArea = document.getElementById('statusArea');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `status-message ${type}`;
+            messageDiv.textContent = message;
+            
+            // Clear previous messages
+            statusArea.innerHTML = '';
+            statusArea.appendChild(messageDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.remove();
+                }
+            }, 5000);
+        }
+
+        console.log('Taskpane script loaded successfully');
     </script>
 </body>
 </html>
