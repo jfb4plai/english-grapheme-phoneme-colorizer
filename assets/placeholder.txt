@@ -1,0 +1,8 @@
+This folder will contain the icons for the Word add-in.
+
+Required files:
+- icon-16.png, icon-32.png, icon-80.png
+- color-icon-16.png, color-icon-32.png, color-icon-80.png  
+- clear-icon-16.png, clear-icon-32.png, clear-icon-80.png
+
+Temporary placeholder until real icons are created.
