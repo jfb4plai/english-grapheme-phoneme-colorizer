@@ -8,414 +8,209 @@
     
     <!-- Office JavaScript API -->
     <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
-    
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        
-        .subtitle {
-            text-align: center;
-            color: #7f8c8d;
-            margin-bottom: 30px;
-            font-style: italic;
-        }
-        
-        .command-section {
-            margin: 25px 0;
-            padding: 20px;
-            border: 2px solid #e3f2fd;
-            border-radius: 8px;
-            background-color: #f8f9fa;
-        }
-        
-        .command-title {
-            font-weight: bold;
-            color: #1976d2;
-            margin-bottom: 10px;
-            font-size: 18px;
-        }
-        
-        .command-description {
-            color: #555;
-            margin-bottom: 15px;
-            line-height: 1.4;
-        }
-        
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            margin: 5px;
-        }
-        
-        button:hover {
-            background-color: #45a049;
-        }
-        
-        button.clear-btn {
-            background-color: #f44336;
-        }
-        
-        button.clear-btn:hover {
-            background-color: #da190b;
-        }
-        
-        .demo-text {
-            background-color: #f0f0f0;
-            padding: 15px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            margin: 10px 0;
-            border-left: 4px solid #4CAF50;
-        }
-        
-        .feature-list {
-            background-color: #e8f5e8;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 15px 0;
-        }
-        
-        .feature-list ul {
-            margin: 10px 0;
-            padding-left: 20px;
-        }
-        
-        .feature-list li {
-            margin: 5px 0;
-            color: #2e7d32;
-        }
-        
-        .warning {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 15px 0;
-            color: #856404;
-        }
-        
-        .info {
-            background-color: #d1ecf1;
-            border: 1px solid #b3d7ff;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 15px 0;
-            color: #0c5460;
-        }
-    </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1>🎨 English Grapheme-Phoneme Colorizer</h1>
-        <p class="subtitle">Commands Interface - Word Add-in</p>
-        
-        <div class="command-section">
-            <div class="command-title">📝 Quick Colorize Command</div>
-            <div class="command-description">
-                Apply instant grapheme-phoneme coloring to selected text in your Word document.
-                This command processes the selected text and applies color coding based on English phonetic patterns.
-            </div>
-            <button onclick="colorizeSelectedText()">🎨 Colorize Selected Text</button>
-        </div>
-        
-        <div class="command-section">
-            <div class="command-title">🧹 Clear Formatting Command</div>
-            <div class="command-description">
-                Remove all grapheme-phoneme coloring from the selected text, returning it to default formatting.
-            </div>
-            <button class="clear-btn" onclick="clearSelectedFormatting()">🧹 Clear Color Formatting</button>
-        </div>
-        
-        <div class="demo-text">
-            <strong>Example text to test with:</strong><br>
-            "The beautiful cat sat reading through tough words."
-        </div>
-        
-        <div class="feature-list">
-            <strong>🎯 What this add-in does:</strong>
-            <ul>
-                <li><strong>Colors vowel sounds</strong> - Different colors for each phoneme</li>
-                <li><strong>Highlights digraphs</strong> - "th", "ch", "sh", "wh", etc.</li>
-                <li><strong>Marks silent letters</strong> - Grayed out invisible sounds</li>
-                <li><strong>Supports 134,000+ words</strong> - Based on CMU Pronunciation Dictionary</li>
-                <li><strong>Instant processing</strong> - Works with selected text or whole documents</li>
-            </ul>
-        </div>
-        
-        <div class="info">
-            <strong>💡 How to use:</strong><br>
-            1. Select text in your Word document<br>
-            2. Click "Quick Colorize" in the Dyslexia Support tab<br>
-            3. Watch the text transform with helpful colors!
-        </div>
-        
-        <div class="warning">
-            <strong>⚠️ Note:</strong> This interface is for command testing. 
-            In the actual Word add-in, these commands are triggered from the ribbon buttons.
-        </div>
-    </div>
-
     <script>
-        // Check if Office.js is available (running in Word vs browser)
+        // Global variables
         let isInWord = false;
         
-        // Initialize Office Add-in only if Office is available
+        // Enhanced grapheme-phoneme mapping
+        const graphemePhonemeMap = {
+            // Vowel sounds with distinct colors
+            'a': { color: '#FF6B6B' },     // cat, cake, car
+            'e': { color: '#4ECDC4' },     // bed, see, her
+            'i': { color: '#45B7D1' },     // bit, bite, bird
+            'o': { color: '#96CEB4' },     // hot, boat, good
+            'u': { color: '#FFEAA7' },     // but, boot, burn
+            'y': { color: '#DDA0DD' },     // gym, my, happy
+            
+            // Common digraphs
+            'th': { color: '#FF9FF3', weight: 'bold' }, // think, this
+            'ch': { color: '#54A0FF', weight: 'bold' }, // chair
+            'sh': { color: '#5F27CD', weight: 'bold' }, // ship
+            'wh': { color: '#00D2D3', weight: 'bold' }, // what
+            'ph': { color: '#FF6348', weight: 'bold' }, // phone
+            'gh': { color: '#2ED573', weight: 'bold' }, // laugh, ghost
+            'ck': { color: '#FFA502', weight: 'bold' }, // back
+            'ng': { color: '#3742FA', weight: 'bold' }, // sing
+            
+            // Vowel combinations
+            'ai': { color: '#FF7675' },  // rain
+            'ay': { color: '#FF7675' },  // day
+            'ea': { color: '#74B9FF' },  // sea, bread
+            'ee': { color: '#0984E3' },  // see
+            'ei': { color: '#6C5CE7' },  // eight, receive
+            'ie': { color: '#A29BFE' },  // field, pie
+            'oa': { color: '#FD79A8' },  // boat
+            'oo': { color: '#FDCB6E' },  // moon, book
+            'ou': { color: '#E17055' },  // house, soup
+            'ow': { color: '#00B894' },  // cow, show
+            'ue': { color: '#00CEC9' },  // true
+            'ui': { color: '#55A3FF' },  // fruit
+        };
+
+        // Initialize Office Add-in (only if Office.js is available)
         if (typeof Office !== 'undefined') {
             Office.onReady(function(info) {
-                console.log('Office.js loaded for commands interface');
+                console.log('Office.js loaded successfully');
                 
                 if (info.host === Office.HostType.Word) {
-                    console.log('Word host detected - Commands ready');
+                    console.log('Word host detected - Functions ready');
                     isInWord = true;
+                    
+                    // Register functions globally for manifest commands
+                    window.colorizeSelection = colorizeSelection;
+                    window.clearFormatting = clearFormatting;
                 } else {
-                    console.log('Non-Word host - Demo mode');
+                    console.log('Non-Word host detected');
                 }
             });
         } else {
-            console.log('Office.js not available - Running in browser demo mode');
+            console.log('Office.js not available - running in browser demo mode');
         }
 
-        // Enhanced grapheme-phoneme mapping based on CMU dictionary patterns
-        const graphemePhonemeMap = {
-            // Vowel sounds with distinct colors
-            'a': { phonemes: ['AE', 'EY', 'AA', 'AH'], color: '#FF6B6B' },     // cat, cake, car, about
-            'e': { phonemes: ['EH', 'IY', 'ER'], color: '#4ECDC4' },          // bed, see, her
-            'i': { phonemes: ['IH', 'AY', 'ER'], color: '#45B7D1' },          // bit, bite, bird
-            'o': { phonemes: ['AA', 'OW', 'UH', 'ER'], color: '#96CEB4' },    // hot, boat, good, word
-            'u': { phonemes: ['UH', 'UW', 'ER'], color: '#FFEAA7' },          // but, boot, burn
-            'y': { phonemes: ['IH', 'AY', 'IY'], color: '#DDA0DD' },          // gym, my, happy
+        // Main colorization function
+        function colorizeSelection() {
+            console.log('colorizeSelection function called');
             
-            // Common digraphs and trigraphs
-            'th': { phonemes: ['TH', 'DH'], color: '#FF9FF3', weight: 'bold' }, // think, this
-            'ch': { phonemes: ['CH'], color: '#54A0FF', weight: 'bold' },        // chair
-            'sh': { phonemes: ['SH'], color: '#5F27CD', weight: 'bold' },        // ship
-            'wh': { phonemes: ['W', 'HW'], color: '#00D2D3', weight: 'bold' },   // what
-            'ph': { phonemes: ['F'], color: '#FF6348', weight: 'bold' },         // phone
-            'gh': { phonemes: ['F', 'G'], color: '#2ED573', weight: 'bold' },    // laugh, ghost
-            'ck': { phonemes: ['K'], color: '#FFA502', weight: 'bold' },         // back
-            'ng': { phonemes: ['NG'], color: '#3742FA', weight: 'bold' },        // sing
-            
-            // Vowel combinations
-            'ai': { phonemes: ['EY'], color: '#FF7675' },  // rain
-            'ay': { phonemes: ['EY'], color: '#FF7675' },  // day
-            'ea': { phonemes: ['IY', 'EH'], color: '#74B9FF' }, // sea, bread
-            'ee': { phonemes: ['IY'], color: '#0984E3' },  // see
-            'ei': { phonemes: ['EY', 'IY'], color: '#6C5CE7' }, // eight, receive
-            'ie': { phonemes: ['IY', 'AY'], color: '#A29BFE' }, // field, pie
-            'oa': { phonemes: ['OW'], color: '#FD79A8' },  // boat
-            'oo': { phonemes: ['UW', 'UH'], color: '#FDCB6E' }, // moon, book
-            'ou': { phonemes: ['AW', 'UW'], color: '#E17055' }, // house, soup
-            'ow': { phonemes: ['AW', 'OW'], color: '#00B894' }, // cow, show
-            'ue': { phonemes: ['UW'], color: '#00CEC9' },  // true
-            'ui': { phonemes: ['UW'], color: '#55A3FF' },  // fruit
-        };
-
-        // Silent letter patterns
-        const silentPatterns = [
-            { pattern: /\bb\b/g, context: 'final', examples: ['lamb', 'thumb'] },
-            { pattern: /k(?=n)/g, context: 'before n', examples: ['knee', 'know'] },
-            { pattern: /w(?=r)/g, context: 'before r', examples: ['write', 'wrong'] },
-            { pattern: /l(?=m|k)/g, context: 'before m/k', examples: ['calm', 'walk'] },
-            { pattern: /t(?=ch)/g, context: 'before ch', examples: ['watch', 'match'] },
-            { pattern: /h(?=onest|our)/g, context: 'in honest/hour', examples: ['honest', 'hour'] }
-        ];
-
-        function colorizeSelectedText() {
-            if (typeof Office !== 'undefined' && Office.context && isInWord) {
-                // Running in Word
-                Word.run(function(context) {
-                    const selection = context.document.getSelection();
-                    selection.load('text');
-                    
-                    return context.sync().then(function() {
-                        const text = selection.text;
-                        if (text.trim() === '') {
-                            showMessage('Please select some text first!', 'warning');
-                            return;
-                        }
-                        
-                        applyGraphemePhonemeColoring(selection, text);
-                        return context.sync();
-                    });
-                }).catch(function(error) {
-                    console.error('Error: ' + error);
-                    showMessage('Error applying coloring: ' + error.message, 'error');
-                });
-            } else {
-                // Demo mode in browser
-                showMessage('Demo: Would colorize selected text with grapheme-phoneme patterns', 'info');
-                demoColorization();
+            if (!isInWord) {
+                console.log('Not in Word - cannot colorize');
+                return;
             }
-        }
 
-        function clearSelectedFormatting() {
-            if (typeof Office !== 'undefined' && Office.context && isInWord) {
-                // Running in Word
-                Word.run(function(context) {
-                    const selection = context.document.getSelection();
-                    selection.load('text');
+            Word.run(function(context) {
+                console.log('Starting Word.run');
+                
+                // Get the current selection
+                const selection = context.document.getSelection();
+                selection.load('text');
+                
+                return context.sync().then(function() {
+                    const text = selection.text;
+                    console.log('Selected text:', text);
                     
-                    return context.sync().then(function() {
-                        if (selection.text.trim() === '') {
-                            showMessage('Please select some text first!', 'warning');
-                            return;
-                        }
-                        
-                        // Clear formatting
-                        selection.font.color = '#000000';
-                        selection.font.bold = false;
-                        selection.font.highlightColor = null;
-                        
-                        showMessage('Formatting cleared successfully!', 'success');
-                        return context.sync();
-                    });
-                }).catch(function(error) {
-                    console.error('Error: ' + error);
-                    showMessage('Error clearing formatting: ' + error.message, 'error');
+                    if (!text || text.trim() === '') {
+                        console.log('No text selected');
+                        return;
+                    }
+                    
+                    // Apply colorization
+                    applyGraphemePhonemeColoring(context, selection, text);
+                    
+                    return context.sync();
+                }).then(function() {
+                    console.log('Colorization completed successfully');
                 });
-            } else {
-                // Demo mode
-                showMessage('Demo: Would clear all color formatting from selected text', 'info');
-            }
-        }
-
-        function applyGraphemePhonemeColoring(selection, text) {
-            const words = text.split(/(\s+)/);
-            
-            words.forEach(function(word, index) {
-                if (word.trim() === '' || /^\s+$/.test(word)) {
-                    return; // Skip whitespace
-                }
                 
-                const cleanWord = word.toLowerCase().replace(/[^\w]/g, '');
-                if (cleanWord === '') return;
-                
-                // Apply coloring logic for each word
-                const wordRange = selection.getRange();
-                colorizeWord(wordRange, cleanWord);
+            }).catch(function(error) {
+                console.error('Error in colorizeSelection:', error);
             });
         }
 
-        function colorizeWord(range, word) {
-            // This is a simplified version - in a full implementation,
-            // you would use the CMU dictionary for accurate phoneme mapping
+        // Clear formatting function
+        function clearFormatting() {
+            console.log('clearFormatting function called');
             
-            for (const [grapheme, properties] of Object.entries(graphemePhonemeMap)) {
-                const regex = new RegExp(grapheme, 'gi');
-                const matches = word.match(regex);
+            if (!isInWord) {
+                console.log('Not in Word - cannot clear formatting');
+                return;
+            }
+
+            Word.run(function(context) {
+                const selection = context.document.getSelection();
+                selection.load('text');
                 
-                if (matches) {
-                    // Apply color to this grapheme
-                    // Note: This is simplified - real implementation would be more complex
+                return context.sync().then(function() {
+                    if (!selection.text || selection.text.trim() === '') {
+                        console.log('No text selected to clear');
+                        return;
+                    }
+                    
+                    // Clear font color and formatting
+                    selection.font.color = '#000000';
+                    selection.font.bold = false;
+                    selection.font.highlightColor = null;
+                    
+                    return context.sync();
+                }).then(function() {
+                    console.log('Formatting cleared successfully');
+                });
+                
+            }).catch(function(error) {
+                console.error('Error in clearFormatting:', error);
+            });
+        }
+
+        // Apply grapheme-phoneme coloring to text
+        function applyGraphemePhonemeColoring(context, selection, text) {
+            console.log('Applying colorization to:', text);
+            
+            // Split text into words and spaces
+            const parts = text.split(/(\s+)/);
+            let currentRange = selection.getRange();
+            let currentIndex = 0;
+            
+            parts.forEach(function(part) {
+                if (part.trim() === '') {
+                    // Skip whitespace
+                    currentIndex += part.length;
+                    return;
+                }
+                
+                // Create range for this word
+                const wordRange = selection.getRange();
+                wordRange.start = currentIndex;
+                wordRange.end = currentIndex + part.length;
+                
+                // Apply coloring to the word
+                colorizeWord(wordRange, part.toLowerCase());
+                
+                currentIndex += part.length;
+            });
+        }
+
+        // Colorize individual word
+        function colorizeWord(range, word) {
+            console.log('Colorizing word:', word);
+            
+            // Remove punctuation for analysis
+            const cleanWord = word.replace(/[^\w]/g, '');
+            
+            // Apply colors based on grapheme patterns
+            // Sort by length (longest first) to avoid conflicts
+            const sortedGraphemes = Object.keys(graphemePhonemeMap).sort((a, b) => b.length - a.length);
+            
+            for (const grapheme of sortedGraphemes) {
+                if (cleanWord.includes(grapheme)) {
+                    const properties = graphemePhonemeMap[grapheme];
+                    
+                    // Apply color
                     range.font.color = properties.color;
+                    
+                    // Apply bold if specified
                     if (properties.weight === 'bold') {
                         range.font.bold = true;
                     }
+                    
+                    // Only apply the first matching pattern to avoid conflicts
+                    break;
                 }
             }
         }
 
-        function demoColorization() {
-            // Create a visual demo in the browser
-            const demoDiv = document.createElement('div');
-            demoDiv.style.cssText = `
-                margin-top: 20px;
-                padding: 15px;
-                background: #f8f9fa;
-                border-radius: 8px;
-                border-left: 4px solid #4CAF50;
-            `;
-            
-            const demoText = "The beautiful cat sat reading through tough words.";
-            const coloredText = demoText
-                .replace(/th/g, '<span style="color: #FF9FF3; font-weight: bold;">th</span>')
-                .replace(/ea/g, '<span style="color: #74B9FF;">ea</span>')
-                .replace(/ou/g, '<span style="color: #E17055;">ou</span>')
-                .replace(/gh/g, '<span style="color: #2ED573; font-weight: bold;">gh</span>')
-                .replace(/a(?!u|i|y|e|o)/g, '<span style="color: #FF6B6B;">a</span>')
-                .replace(/e(?!a|e|i|y|o|u)/g, '<span style="color: #4ECDC4;">e</span>')
-                .replace(/i(?!e|a|y|o|u)/g, '<span style="color: #45B7D1;">i</span>')
-                .replace(/o(?!a|o|u|w)/g, '<span style="color: #96CEB4;">o</span>')
-                .replace(/u(?!e|i|a|y|o)/g, '<span style="color: #FFEAA7;">u</span>');
-            
-            demoDiv.innerHTML = `
-                <strong>Demo Colorization Result:</strong><br>
-                <div style="font-size: 18px; margin-top: 10px; font-family: 'Times New Roman', serif;">
-                    ${coloredText}
-                </div>
-                <div style="margin-top: 10px; font-size: 12px; color: #666;">
-                    <em>This shows how text would be colored in Word with grapheme-phoneme patterns</em>
-                </div>
-            `;
-            
-            // Remove any existing demo
-            const existingDemo = document.querySelector('.demo-result');
-            if (existingDemo) {
-                existingDemo.remove();
-            }
-            
-            demoDiv.className = 'demo-result';
-            document.querySelector('.container').appendChild(demoDiv);
-        }
-
-        function showMessage(message, type) {
-            const messageDiv = document.createElement('div');
-            const colors = {
-                'success': { bg: '#d4edda', border: '#c3e6cb', text: '#155724' },
-                'warning': { bg: '#fff3cd', border: '#ffeaa7', text: '#856404' },
-                'error': { bg: '#f8d7da', border: '#f5c6cb', text: '#721c24' },
-                'info': { bg: '#d1ecf1', border: '#b3d7ff', text: '#0c5460' }
+        // Export functions for global access
+        if (typeof module !== 'undefined' && module.exports) {
+            module.exports = {
+                colorizeSelection: colorizeSelection,
+                clearFormatting: clearFormatting
             };
-            
-            const color = colors[type] || colors['info'];
-            messageDiv.style.cssText = `
-                background-color: ${color.bg};
-                border: 1px solid ${color.border};
-                color: ${color.text};
-                padding: 10px;
-                border-radius: 4px;
-                margin: 15px 0;
-            `;
-            messageDiv.textContent = message;
-            
-            // Remove existing messages
-            const existingMessages = document.querySelectorAll('.status-message');
-            existingMessages.forEach(msg => msg.remove());
-            
-            messageDiv.className = 'status-message';
-            document.querySelector('.container').appendChild(messageDiv);
-            
-            // Auto-remove after 5 seconds
-            setTimeout(() => {
-                if (messageDiv.parentNode) {
-                    messageDiv.remove();
-                }
-            }, 5000);
+        }
+        
+        // Also add to window for direct access
+        if (typeof window !== 'undefined') {
+            window.colorizeSelection = colorizeSelection;
+            window.clearFormatting = clearFormatting;
         }
     </script>
 </body>
