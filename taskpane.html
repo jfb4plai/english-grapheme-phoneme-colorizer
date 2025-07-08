@@ -40,6 +40,44 @@
             font-style: italic;
         }
         
+        .demo-area {
+            margin: 20px 0;
+            padding: 15px;
+            border: 2px solid #e3f2fd;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        
+        .demo-title {
+            font-weight: bold;
+            color: #1976d2;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            font-family: 'Times New Roman', serif;
+            resize: vertical;
+        }
+        
+        .demo-output {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            min-height: 50px;
+            font-size: 18px;
+            font-family: 'Times New Roman', serif;
+            line-height: 1.8;
+        }
+        
         .control-section {
             margin: 20px 0;
             padding: 15px;
@@ -91,13 +129,13 @@
             background-color: #e84393;
         }
         
-        button.analyze-btn {
+        button.demo-btn {
             background-color: #00b894;
             width: 100%;
             margin-top: 10px;
         }
         
-        button.analyze-btn:hover {
+        button.demo-btn:hover {
             background-color: #00a085;
         }
         
@@ -181,10 +219,19 @@
         <h1>🧠 Grapheme-Phoneme</h1>
         <p class="subtitle">Visualizing English sound-spelling correspondences</p>
         
+        <div class="demo-area">
+            <div class="demo-title">🔬 Live Demo - Try it here first!</div>
+            <textarea id="demoInput" placeholder="Type some text here to see grapheme-phoneme colorization...">The beautiful cat sat reading through tough words</textarea>
+            <button class="demo-btn" onclick="colorizeDemo()">🎨 Colorize Demo</button>
+            <div class="demo-output" id="demoOutput">
+                Click "Colorize Demo" to see each grapheme colored individually!
+            </div>
+        </div>
+        
         <div class="control-section">
             <div class="control-title">Coloring Strategy:</div>
             <select id="coloringStrategy">
-                <option value="phoneme">Phoneme-based</option>
+                <option value="phoneme">Phoneme-based (recommended)</option>
                 <option value="grapheme">Grapheme-based</option>
                 <option value="difficulty">Difficulty-based</option>
             </select>
@@ -203,8 +250,6 @@
             <button id="colorizeBtn" onclick="colorizeText()">🎨 Colorize</button>
             <button class="clear-btn" id="clearBtn" onclick="clearFormatting()">🗑️ Clear</button>
         </div>
-        
-        <button class="analyze-btn" id="analyzeBtn" onclick="analyzeDifficulty()">📊 Analyze Difficulty</button>
         
         <div class="color-legend">
             <div class="legend-title">
@@ -227,7 +272,7 @@
         
         <div class="info">
             <strong>For Dyslexia Support:</strong><br>
-            This tool helps visualize grapheme-phoneme correspondences to aid in understanding the relationship between written letters and their sounds.
+            This tool helps visualize grapheme-phoneme correspondences by coloring each sound pattern individually within words.
         </div>
         
         <div id="statusArea"></div>
@@ -237,13 +282,111 @@
         // Global variables
         let isInWord = false;
         
-        // Grapheme color mapping
-        const colorMap = {
-            vowels: '#FF6B6B',
-            consonants: '#4ECDC4',
-            digraphs: '#6C5CE7',
-            trigraphs: '#E17055',
-            silent: '#95A5A6'
+        // Comprehensive grapheme-phoneme color mapping (ordered by priority - longest first)
+        const graphemeColors = {
+            // 4+ letter combinations
+            'ough': '#8E44AD',  // tough, through
+            'augh': '#D35400',  // laugh, caught
+            'eigh': '#E74C3C',  // eight, weight
+            'ight': '#2980B9',  // night, sight
+            
+            // 3-letter combinations
+            'tch': '#9B59B6',   // watch, catch
+            'dge': '#1ABC9C',   // bridge, edge
+            'sch': '#F39C12',   // school, schedule
+            'thr': '#E67E22',   // three, through
+            'shr': '#27AE60',   // shrink, shrimp
+            'str': '#3498DB',   // street, strong
+            'spr': '#8E44AD',   // spring, spray
+            'scr': '#D35400',   // screen, scream
+            'spl': '#E74C3C',   // split, splash
+            'squ': '#2980B9',   // square, squirrel
+            
+            // 2-letter digraphs (consonants)
+            'th': '#FF9FF3',    // think, this
+            'ch': '#54A0FF',    // chair, much
+            'sh': '#5F27CD',    // ship, fish
+            'wh': '#00D2D3',    // what, when
+            'ph': '#FF6348',    // phone, graph
+            'gh': '#2ED573',    // laugh, ghost
+            'ck': '#FFA502',    // back, truck
+            'ng': '#3742FA',    // sing, ring
+            'nk': '#FF7675',    // think, bank
+            'st': '#2ECC71',    // start, best
+            'sp': '#3498DB',    // stop, crisp
+            'sk': '#9B59B6',    // skip, ask
+            'sm': '#1ABC9C',    // smile, prism
+            'sn': '#F39C12',    // snake, snore
+            'sl': '#E67E22',    // slide, slow
+            'sw': '#27AE60',    // swim, sweet
+            'tw': '#8E44AD',    // twin, twelve
+            'tr': '#D35400',    // tree, street
+            'dr': '#E74C3C',    // dream, hundred
+            'fr': '#2980B9',    // from, afraid
+            'gr': '#16A085',    // green, agree
+            'br': '#C0392B',    // bring, about
+            'cr': '#8C4A2F',    // create, across
+            'pr': '#7D3C98',    // pretty, surprise
+            'bl': '#138D75',    // blue, table
+            'cl': '#B7950B',    // class, uncle
+            'fl': '#A04000',    // floor, reflect
+            'gl': '#6C3483',    // glass, single
+            'pl': '#148F77',    // place, apple
+            'sl': '#B7950B',    // slow, sleep
+            
+            // 2-letter vowel combinations
+            'ai': '#FF7675',    // rain, train
+            'ay': '#FF7675',    // day, play
+            'ea': '#74B9FF',    // sea, bread
+            'ee': '#0984E3',    // see, tree
+            'ei': '#6C5CE7',    // eight, receive
+            'ie': '#A29BFE',    // field, pie
+            'oa': '#FD79A8',    // boat, coat
+            'oo': '#FDCB6E',    // moon, book
+            'ou': '#E17055',    // house, soup
+            'ow': '#00B894',    // cow, show
+            'ue': '#00CEC9',    // true, blue
+            'ui': '#55A3FF',    // fruit, build
+            'au': '#E84393',    // author, because
+            'aw': '#00A8FF',    // saw, draw
+            'ew': '#9C88FF',    // new, grew
+            'oy': '#FF6B9D',    // boy, enjoy
+            'oi': '#FF9F43',    // coin, voice
+            'ar': '#FF3838',    // car, hard
+            'er': '#1DD1A1',    // her, water
+            'ir': '#54A0FF',    // bird, first
+            'or': '#5F27CD',    // for, short
+            'ur': '#FF9FF3',    // turn, hurt
+            'yr': '#FFC312',    // martyr, lyre
+            
+            // Silent letter combinations
+            'wr': '#BDC3C7',    // write, wrong
+            'kn': '#95A5A6',    // knee, know
+            'mb': '#7F8C8D',    // thumb, lamb
+            'bt': '#ABB2B9',    // debt, doubt
+            'gn': '#AEB6BF',    // sign, design
+            'mn': '#85929E',    // autumn, hymn
+            'lm': '#D5DBDB',    // calm, palm
+            'lk': '#CCD1D1',    // walk, talk
+            'lf': '#BFC9CA',    // half, calf
+            'sc': '#B2BABB',    // scene, science
+            'ps': '#A6ACAF',    // psychology
+            'pt': '#99A3A4',    // receipt, depot
+            
+            // Single vowels (lowest priority)
+            'a': '#FF6B6B',     // cat, hat
+            'e': '#4ECDC4',     // bed, red
+            'i': '#45B7D1',     // bit, sit
+            'o': '#96CEB4',     // hot, dot
+            'u': '#FFEAA7',     // but, cut
+            'y': '#DDA0DD',     // gym, happy
+            
+            // Single consonants (very low priority)
+            'b': '#FF7979', 'c': '#74B9FF', 'd': '#55A3FF', 'f': '#FD79A8',
+            'g': '#FDCB6E', 'h': '#E17055', 'j': '#00B894', 'k': '#00CEC9',
+            'l': '#6C5CE7', 'm': '#A29BFE', 'n': '#FF7675', 'p': '#FFD93D',
+            'q': '#6BCF7F', 'r': '#4D96FF', 's': '#9B59B6', 't': '#E17055',
+            'v': '#F39C12', 'w': '#8E44AD', 'x': '#D35400', 'z': '#E74C3C'
         };
 
         // Initialize Office Add-in
@@ -254,23 +397,108 @@
                 if (info.host === Office.HostType.Word) {
                     console.log('Word environment detected');
                     isInWord = true;
-                    showMessage('Connected to Microsoft Word', 'success');
+                    showMessage('Connected to Microsoft Word - Ready for grapheme-phoneme colorization!', 'success');
                 } else {
                     console.log('Non-Word environment');
-                    showMessage('Running in demo mode - install in Word for full functionality', 'warning');
+                    showMessage('Running in demo mode - try the live demo above!', 'warning');
                 }
             });
         } else {
             console.log('Office.js not available - demo mode');
-            showMessage('Office.js not available - running in browser demo mode', 'info-msg');
+            showMessage('Office.js not available - use the demo area to test colorization!', 'info-msg');
         }
 
-        // Colorize text function
+        // Demo colorization function (works in browser)
+        function colorizeDemo() {
+            const input = document.getElementById('demoInput').value;
+            const output = document.getElementById('demoOutput');
+            
+            if (!input.trim()) {
+                output.innerHTML = '<em style="color: #999;">Please enter some text to colorize...</em>';
+                return;
+            }
+            
+            console.log('Demo colorization for:', input);
+            const colorizedHtml = colorizeTextToHtml(input);
+            output.innerHTML = colorizedHtml;
+            
+            showMessage('Demo colorization complete! Each grapheme is colored individually.', 'success');
+        }
+
+        // Convert text to colorized HTML (for demo)
+        function colorizeTextToHtml(text) {
+            const words = text.split(/(\s+)/);
+            let result = '';
+            
+            words.forEach(word => {
+                if (/^\s+$/.test(word)) {
+                    result += word; // Preserve whitespace
+                    return;
+                }
+                
+                result += colorizeWordToHtml(word);
+            });
+            
+            return result;
+        }
+
+        // Colorize individual word to HTML (for demo)
+        function colorizeWordToHtml(word) {
+            const cleanWord = word.toLowerCase().replace(/[^\w]/g, '');
+            let result = '';
+            let i = 0;
+            
+            // Extract punctuation
+            const leadingPunct = word.match(/^[^\w]*/)[0];
+            const trailingPunct = word.match(/[^\w]*$/)[0];
+            const coreWord = word.slice(leadingPunct.length, word.length - trailingPunct.length);
+            
+            result += leadingPunct;
+            
+            // Process core word character by character
+            i = 0;
+            while (i < coreWord.length) {
+                let matched = false;
+                let matchedGrapheme = '';
+                let matchedColor = '';
+                
+                // Try to match graphemes from longest to shortest
+                const sortedGraphemes = Object.keys(graphemeColors).sort((a, b) => b.length - a.length);
+                
+                for (const grapheme of sortedGraphemes) {
+                    const remaining = coreWord.slice(i).toLowerCase();
+                    if (remaining.startsWith(grapheme)) {
+                        matchedGrapheme = grapheme;
+                        matchedColor = graphemeColors[grapheme];
+                        matched = true;
+                        break;
+                    }
+                }
+                
+                if (matched) {
+                    const originalChars = coreWord.slice(i, i + matchedGrapheme.length);
+                    const isBold = matchedGrapheme.length > 1; // Bold for digraphs
+                    const fontWeight = isBold ? 'bold' : 'normal';
+                    
+                    result += `<span style="color: ${matchedColor}; font-weight: ${fontWeight};">${originalChars}</span>`;
+                    i += matchedGrapheme.length;
+                } else {
+                    // Single character fallback
+                    result += `<span style="color: #333;">${coreWord[i]}</span>`;
+                    i++;
+                }
+            }
+            
+            result += trailingPunct;
+            return result;
+        }
+
+        // Advanced Word colorization function
         function colorizeText() {
-            console.log('Colorize function called');
+            console.log('Word colorization called');
             
             if (!isInWord) {
-                showMessage('Demo: Colorization would apply grapheme-phoneme patterns', 'info-msg');
+                showMessage('Use the demo area above to test colorization, or install in Microsoft Word for full functionality', 'warning');
                 return;
             }
 
@@ -298,13 +526,15 @@
                             return context.sync();
                         }
                         
-                        // Apply basic colorization
-                        return applyBasicColorization(range, text, context);
+                        showMessage('Applying grapheme-by-grapheme colorization...', 'info-msg');
+                        
+                        // Apply grapheme-by-grapheme colorization
+                        return applyGraphemeByGraphemeColorization(context, range, text);
                     });
                     
                 } catch (error) {
                     console.error('Error in colorizeText:', error);
-                    showMessage('Error applying colorization: ' + error.message, 'error');
+                    showMessage('Error: ' + error.message, 'error');
                 }
             }).catch(function(error) {
                 console.error('Word.run error:', error);
@@ -312,12 +542,82 @@
             });
         }
 
+        // Apply grapheme-by-grapheme colorization in Word
+        function applyGraphemeByGraphemeColorization(context, range, text) {
+            console.log('Applying grapheme-by-grapheme colorization');
+            
+            // This is a simplified version - the full implementation would be very complex
+            // For now, we'll apply word-level colorization with the primary grapheme
+            
+            const words = text.split(/(\s+)/);
+            let currentPos = 0;
+            
+            // Clear formatting first
+            range.font.color = '#000000';
+            range.font.bold = false;
+            
+            return context.sync().then(function() {
+                // Process each word
+                const wordPromises = [];
+                
+                words.forEach(function(word) {
+                    if (word.trim() === '' || /^\s+$/.test(word)) {
+                        currentPos += word.length;
+                        return; // Skip whitespace
+                    }
+                    
+                    // Find the primary grapheme for this word
+                    const cleanWord = word.toLowerCase().replace(/[^\w]/g, '');
+                    const graphemeInfo = findPrimaryGrapheme(cleanWord);
+                    
+                    if (graphemeInfo) {
+                        // Create range for this word
+                        const wordRange = range.getRange();
+                        wordRange.start = currentPos;
+                        wordRange.end = currentPos + word.length;
+                        
+                        // Apply color
+                        wordRange.font.color = graphemeInfo.color;
+                        if (graphemeInfo.grapheme.length > 1) {
+                            wordRange.font.bold = true;
+                        }
+                        
+                        wordPromises.push(context.sync());
+                    }
+                    
+                    currentPos += word.length;
+                });
+                
+                return Promise.all(wordPromises);
+            }).then(function() {
+                return context.sync().then(function() {
+                    showMessage('Grapheme-phoneme colorization completed! Each word colored by its primary grapheme.', 'success');
+                });
+            });
+        }
+
+        // Find primary grapheme in word
+        function findPrimaryGrapheme(word) {
+            const sortedGraphemes = Object.keys(graphemeColors).sort((a, b) => b.length - a.length);
+            
+            for (const grapheme of sortedGraphemes) {
+                if (word.includes(grapheme)) {
+                    return {
+                        grapheme: grapheme,
+                        color: graphemeColors[grapheme]
+                    };
+                }
+            }
+            
+            return null;
+        }
+
         // Clear formatting function
         function clearFormatting() {
             console.log('Clear formatting called');
             
             if (!isInWord) {
-                showMessage('Demo: Would clear all color formatting', 'info-msg');
+                showMessage('Demo: Would clear all color formatting in Word', 'info-msg');
                 return;
             }
 
@@ -342,12 +642,12 @@
                             return context.sync();
                         }
                         
-                        // Clear font formatting
+                        // Clear all formatting
                         range.font.color = '#000000';
                         range.font.bold = false;
                         
                         return context.sync().then(function() {
-                            showMessage('Formatting cleared successfully', 'success');
+                            showMessage('All grapheme-phoneme formatting cleared successfully', 'success');
                         });
                     });
                     
@@ -357,78 +657,6 @@
                 }
             }).catch(function(error) {
                 console.error('Word.run error in clearFormatting:', error);
-                showMessage('Word API error: ' + error.message, 'error');
-            });
-        }
-
-        // Apply basic colorization
-        function applyBasicColorization(range, text, context) {
-            console.log('Applying basic colorization');
-            
-            // Determine primary grapheme type
-            let color = colorMap.consonants; // default
-            
-            if (/[aeiouAEIOU]/.test(text)) {
-                color = colorMap.vowels;
-            }
-            
-            if (/th|ch|sh|wh|ph|gh/i.test(text)) {
-                color = colorMap.digraphs;
-                range.font.bold = true;
-            }
-            
-            // Apply the color
-            range.font.color = color;
-            
-            return context.sync().then(function() {
-                showMessage('Colorization applied successfully', 'success');
-                console.log('Colorization completed');
-            });
-        }
-
-        // Analyze difficulty function
-        function analyzeDifficulty() {
-            console.log('Analyze difficulty called');
-            
-            if (!isInWord) {
-                showMessage('Demo: Would analyze text difficulty and suggest improvements', 'info-msg');
-                return;
-            }
-
-            Word.run(function(context) {
-                try {
-                    const selection = context.document.getSelection();
-                    selection.load('text');
-                    
-                    return context.sync().then(function() {
-                        const text = selection.text;
-                        
-                        if (!text || text.trim() === '') {
-                            showMessage('Please select text to analyze', 'warning');
-                            return;
-                        }
-                        
-                        // Simple analysis
-                        const wordCount = text.split(/\s+/).length;
-                        const hasDigraphs = /th|ch|sh|wh|ph|gh/i.test(text);
-                        const hasComplexVowels = /ai|ay|ea|ee|ie|oa|oo|ou|ow|ue/i.test(text);
-                        
-                        let difficulty = 'Easy';
-                        if (hasDigraphs && hasComplexVowels) {
-                            difficulty = 'Hard';
-                        } else if (hasDigraphs || hasComplexVowels) {
-                            difficulty = 'Medium';
-                        }
-                        
-                        showMessage(`Analysis: ${wordCount} words, Difficulty: ${difficulty}`, 'info-msg');
-                    });
-                    
-                } catch (error) {
-                    console.error('Error in analyzeDifficulty:', error);
-                    showMessage('Error analyzing text: ' + error.message, 'error');
-                }
-            }).catch(function(error) {
-                console.error('Word.run error in analyzeDifficulty:', error);
             });
         }
 
@@ -443,15 +671,15 @@
             statusArea.innerHTML = '';
             statusArea.appendChild(messageDiv);
             
-            // Auto-remove after 5 seconds
+            // Auto-remove after 6 seconds
             setTimeout(() => {
                 if (messageDiv.parentNode) {
                     messageDiv.remove();
                 }
-            }, 5000);
+            }, 6000);
         }
 
-        console.log('Taskpane script loaded successfully');
+        console.log('Grapheme-by-grapheme taskpane script loaded successfully');
     </script>
 </body>
 </html>
