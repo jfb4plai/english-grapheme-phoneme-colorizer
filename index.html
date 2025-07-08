@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="English Grapheme-Phoneme Colorizer - A Microsoft Word add-in designed to support dyslexic readers through visual phonetic patterns">
+    <meta name="keywords" content="dyslexia, reading support, phonetics, grapheme, phoneme, Word add-in, education, accessibility">
+    <meta name="author" content="jfb4plai">
+    
+    <title>English Grapheme-Phoneme Colorizer | Dyslexia Reading Support Tool</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/icon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./assets/icon-16.png">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jfb4plai.github.io/english-grapheme-phoneme-colorizer/">
+    <meta property="og:title" content="English Grapheme-Phoneme Colorizer">
+    <meta property="og:description" content="Transform reading for dyslexic students with visual phonetic patterns in Microsoft Word">
+    <meta property="og:image" content="https://jfb4plai.github.io/english-grapheme-phoneme-colorizer/assets/icon-80.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://jfb4plai.github.io/english-grapheme-phoneme-colorizer/">
+    <meta property="twitter:title" content="English Grapheme-Phoneme Colorizer">
+    <meta property="twitter:description" content="Transform reading for dyslexic students with visual phonetic patterns in Microsoft Word">
+    <meta property="twitter:image" content="https://jfb4plai.github.io/english-grapheme-phoneme-colorizer/assets/icon-80.png">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4a90e2;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #4a90e2;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="white" opacity="0.1"/><circle cx="30" cy="30" r="1.5" fill="white" opacity="0.1"/><circle cx="60" cy="20" r="1" fill="white" opacity="0.1"/><circle cx="80" cy="50" r="1.5" fill="white" opacity="0.1"/><circle cx="20" cy="70" r="1" fill="white" opacity="0.1"/><circle cx="70" cy="80" r="1.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero .subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn.secondary {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            box-shadow: none;
+        }
+
+        .btn.secondary:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .btn.accent {
+            background: #ff6b6b;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn.accent:hover {
+            background: #ff5252;
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        /* Demo Section */
+        .demo {
+            background: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .demo h2 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .demo-text {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem auto;
+            max-width: 800px;
+            border-left: 5px solid #4CAF50;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .original-text {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #666;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .colored-text {
+            font-size: 1.4rem;
+            font-family: 'Times New Roman', serif;
+            margin-top: 1rem;
+            line-height: 1.8;
+        }
+
+        /* Color coding for demo */
+        .vowel-a { color: #FF6B6B; font-weight: 500; }
+        .vowel-e { color: #4ECDC4; font-weight: 500; }
+        .vowel-i { color: #45B7D1; font-weight: 500; }
+        .vowel-o { color: #96CEB4; font-weight: 500; }
+        .vowel-u { color: #FFEAA7; font-weight: 500; }
+        .digraph-th { color: #FF9FF3; font-weight: bold; }
+        .digraph-ea { color: #74B9FF; font-weight: 500; }
+        .digraph-ou { color: #E17055; font-weight: 500; }
+        .digraph-gh { color: #2ED573; font-weight: bold; }
+        .silent { color: #ccc; }
+
+        /* Features Section */
+        .features {
+            background: #f8f9fa;
+            padding: 4rem 0;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 3rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Stats Section */
+        .stats {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stat-item h3 {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-item p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* How it works */
+        .how-it-works {
+            background: white;
+            padding: 4rem 0;
+        }
+
+        .how-it-works h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 3rem;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .step {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 50%;
+            line-height: 60px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .step h3 {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .step p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            background: #333;
+            color: white;
+            padding: 3rem 0 1rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #4CAF50;
+        }
+
+        .footer-section p,
+        .footer-section li {
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #4CAF50;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #555;
+            color: #999;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .features h2,
+            .demo h2,
+            .how-it-works h2 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Loading animation for colorization */
+        .colorizing {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .colorizing::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(76, 175, 80, 0.3), transparent);
+            animation: slide 1.5s infinite;
+        }
+
+        @keyframes slide {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <a href="#" class="logo">
+                🎨 Grapheme-Phoneme Colorizer
+            </a>
+            <ul class="nav-links">
+                <li><a href="#demo">Demo</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#how-it-works">How it works</a></li>
+                <li><a href="https://github.com/jfb4plai/english-grapheme-phoneme-colorizer">GitHub</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content fade-in-up">
+                <h1>Transform Reading for Dyslexic Students</h1>
+                <p class="subtitle">
+                    The first open-source Microsoft Word add-in that uses grapheme-phoneme colorization 
+                    to make English text more accessible for dyslexic readers
+                </p>
+                <div class="cta-buttons">
+                    <a href="./taskpane.html" class="btn accent">🚀 Try Live Demo</a>
+                    <a href="./manifest.xml" class="btn" download="English-Grapheme-Phoneme-Colorizer.xml">📥 Download for Word</a>
+                    <a href="https://github.com/jfb4plai/english-grapheme-phoneme-colorizer" class="btn secondary">🔗 View on GitHub</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section id="demo" class="demo">
+        <div class="container">
+            <h2>See the Magic in Action</h2>
+            <p>Watch how grapheme-phoneme coloring transforms difficult text into readable patterns:</p>
+            
+            <div class="demo-text">
+                <div class="original-text">
+                    <strong>Original text:</strong><br>
+                    "The beautiful cat sat reading through tough words with silent letters."
+                </div>
+                
+                <div style="text-align: center; margin: 1rem 0;">
+                    <button class="btn" onclick="colorizeDemo()">🎨 Colorize Text</button>
+                </div>
+                
+                <div class="colored-text" id="colorized-demo">
+                    <em>Click "Colorize Text" to see the transformation!</em>
+                </div>
+            </div>
+            
+            <div style="margin-top: 2rem;">
+                <h3 style="color: #4CAF50; margin-bottom: 1rem;">🎯 What you see:</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; text-align: left; max-width: 800px; margin: 0 auto;">
+                    <div><span class="vowel-a">Red vowels</span> - Short 'a' sounds</div>
+                    <div><span class="vowel-e">Teal vowels</span> - Short 'e' sounds</div>
+                    <div><span class="vowel-i">Blue vowels</span> - Short 'i' sounds</div>
+                    <div><span class="digraph-th">Pink digraphs</span> - 'th' sounds</div>
+                    <div><span class="digraph-ea">Blue digraphs</span> - 'ea' sounds</div>
+                    <div><span class="silent">Gray letters</span> - Silent letters</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2>Powerful Features for Reading Success</h2>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Smart Color Coding</h3>
+                    <p>Each grapheme-phoneme pattern gets a unique color, making it easier for dyslexic readers to recognize and remember sound patterns.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔤</div>
+                    <h3>134,000+ Words</h3>
+                    <p>Built on the Carnegie Mellon University Pronunciation Dictionary, supporting an extensive vocabulary with accurate phonetic mappings.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">👻</div>
+                    <h3>Silent Letter Detection</h3>
+                    <p>Automatically identifies and dims silent letters, helping students understand which letters to pronounce and which to ignore.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Instant Processing</h3>
+                    <p>Select any text in Word and colorize it instantly. Works with single words, sentences, paragraphs, or entire documents.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Evidence-Based</h3>
+                    <p>Based on reading research showing that visual phonetic cues significantly improve decoding skills for struggling readers.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Open Source</h3>
+                    <p>Completely free and open source, allowing teachers and developers worldwide to contribute improvements and adaptations.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h3>20%</h3>
+                    <p>of students struggle with reading due to dyslexia or learning differences</p>
+                </div>
+                <div class="stat-item">
+                    <h3>134K</h3>
+                    <p>words supported in our phonetic dictionary database</p>
+                </div>
+                <div class="stat-item">
+                    <h3>40+</h3>
+                    <p>distinct grapheme-phoneme patterns color-coded for clarity</p>
+                </div>
+                <div class="stat-item">
+                    <h3>100%</h3>
+                    <p>free and open source for all educators worldwide</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it Works Section -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <h2>How It Works</h2>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Install the Add-in</h3>
+                    <p>Download the manifest file and install it in Microsoft Word through the Developer tab - takes less than 2 minutes!</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Select Text</h3>
+                    <p>Highlight any text in your Word document - from single words to entire pages. The add-in works with any English text.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Click Colorize</h3>
+                    <p>Use the "Quick Colorize" button in the new Dyslexia Support tab to instantly apply grapheme-phoneme color patterns.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Read with Confidence</h3>
+                    <p>Students can now see phonetic patterns visually, making it easier to decode unfamiliar words and build reading fluency.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About This Project</h3>
+                    <p>The English Grapheme-Phoneme Colorizer was created to support dyslexic learners by making the connection between written letters and spoken sounds more visible.</p>
+                    <p style="margin-top: 1rem;">Built with ❤️ by educators, for educators.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="./taskpane.html">Try the Demo</a></li>
+                        <li><a href="./manifest.xml" download>Download Add-in</a></li>
+                        <li><a href="https://github.com/jfb4plai/english-grapheme-phoneme-colorizer">GitHub Repository</a></li>
+                        <li><a href="https://github.com/jfb4plai/english-grapheme-phoneme-colorizer/issues">Report Issues</a></li>
+                        <li><a href="https://docs.microsoft.com/office/dev/add-ins/">Word Add-ins Documentation</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Technical Info</h3>
+                    <ul>
+                        <li>Built for Microsoft Word 2016+</li>
+                        <li>Based on CMU Pronunciation Dictionary</li>
+                        <li>Uses Office.js API</li>
+                        <li>MIT License - Free to use and modify</li>
+                        <li>Cross-platform compatible</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Educational Impact</h3>
+                    <p>This tool aims to bridge the gap between phonetic awareness and reading comprehension, particularly for students with dyslexia.</p>
+                    <p style="margin-top: 1rem;"><em>"Making the invisible patterns of language visible."</em></p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 jfb4plai. Released under MIT License. Created for the educational community worldwide.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Demo colorization function
+        function colorizeDemo() {
+            const demoElement = document.getElementById('colorized-demo');
+            const originalText = "The beautiful cat sat reading through tough words with silent letters.";
+            
+            // Add loading animation
+            demoElement.classList.add('colorizing');
+            demoElement.innerHTML = '<em>Colorizing text...</em>';
+            
+            setTimeout(() => {
+                // Remove loading animation
+                demoElement.classList.remove('colorizing');
+                
+                // Apply colorization
+                const colorizedText = originalText
+                    .replace(/Th/g, '<span class="digraph-th">Th</span>')
+                    .replace(/ea/g, '<span class="digraph-ea">ea</span>')
+                    .replace(/ou/g, '<span class="digraph-ou">ou</span>')
+                    .replace(/gh/g, '<span class="digraph-gh">gh</span>')
+                    .replace(/a(?![euioy])/g, '<span class="vowel-a">a</span>')
+                    .replace(/e(?![aeuioy])/g, '<span class="vowel-e">e</span>')
+                    .replace(/i(?![aeuoy])/g, '<span class="vowel-i">i</span>')
+                    .replace(/o(?![aeuiy])/g, '<span class="vowel-o">o</span>')
+                    .replace(/u(?![aeoiy])/g, '<span class="vowel-u">u</span>')
+                    .replace(/t(?=h)/g, '<span class="silent">t</span>') // Silent t in "th"
+                    .replace(/l(?=\s)/g, '<span class="silent">l</span>'); // Silent letters example
+                
+                demoElement.innerHTML = `<strong>Colorized result:</strong><br>${colorizedText}`;
+                
+                // Add success animation
+                demoElement.style.animation = 'fadeInUp 0.6s ease-out';
+            }, 1500);
+        }
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add intersection observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in-up');
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for animation
+        document.querySelectorAll('.feature-card, .step, .stat-item').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Add loading states and error handling
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if icons exist and show fallbacks if needed
+            const icons = document.querySelectorAll('img[src*="assets/"]');
+            icons.forEach(img => {
+                img.onerror = function() {
+                    this.style.display = 'none';
+                };
+            });
+
+            // Add click tracking for analytics (if needed)
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    const action = this.textContent.trim();
+                    console.log(`Button clicked: ${action}`);
+                    // Add analytics tracking here if needed
+                });
+            });
+        });
+    </script>
+</body>
+</html>
