@@ -16,41 +16,17 @@
         let isInWord = false;
         
         // Enhanced grapheme-phoneme mapping
-        const graphemePhonemeMap = {
-            // Vowel sounds with distinct colors
-            'a': { color: '#FF6B6B' },     // cat, cake, car
-            'e': { color: '#4ECDC4' },     // bed, see, her
-            'i': { color: '#45B7D1' },     // bit, bite, bird
-            'o': { color: '#96CEB4' },     // hot, boat, good
-            'u': { color: '#FFEAA7' },     // but, boot, burn
-            'y': { color: '#DDA0DD' },     // gym, my, happy
-            
-            // Common digraphs
-            'th': { color: '#FF9FF3', weight: 'bold' }, // think, this
-            'ch': { color: '#54A0FF', weight: 'bold' }, // chair
-            'sh': { color: '#5F27CD', weight: 'bold' }, // ship
-            'wh': { color: '#00D2D3', weight: 'bold' }, // what
-            'ph': { color: '#FF6348', weight: 'bold' }, // phone
-            'gh': { color: '#2ED573', weight: 'bold' }, // laugh, ghost
-            'ck': { color: '#FFA502', weight: 'bold' }, // back
-            'ng': { color: '#3742FA', weight: 'bold' }, // sing
-            
-            // Vowel combinations
-            'ai': { color: '#FF7675' },  // rain
-            'ay': { color: '#FF7675' },  // day
-            'ea': { color: '#74B9FF' },  // sea, bread
-            'ee': { color: '#0984E3' },  // see
-            'ei': { color: '#6C5CE7' },  // eight, receive
-            'ie': { color: '#A29BFE' },  // field, pie
-            'oa': { color: '#FD79A8' },  // boat
-            'oo': { color: '#FDCB6E' },  // moon, book
-            'ou': { color: '#E17055' },  // house, soup
-            'ow': { color: '#00B894' },  // cow, show
-            'ue': { color: '#00CEC9' },  // true
-            'ui': { color: '#55A3FF' },  // fruit
+        const graphemeColors = {
+            'th': '#FF9FF3', 'ch': '#54A0FF', 'sh': '#5F27CD', 'wh': '#00D2D3',
+            'ph': '#FF6348', 'gh': '#2ED573', 'ck': '#FFA502', 'ng': '#3742FA',
+            'ai': '#FF7675', 'ay': '#FF7675', 'ea': '#74B9FF', 'ee': '#0984E3',
+            'ei': '#6C5CE7', 'ie': '#A29BFE', 'oa': '#FD79A8', 'oo': '#FDCB6E',
+            'ou': '#E17055', 'ow': '#00B894', 'ue': '#00CEC9', 'ui': '#55A3FF',
+            'a': '#FF6B6B', 'e': '#4ECDC4', 'i': '#45B7D1', 'o': '#96CEB4',
+            'u': '#FFEAA7', 'y': '#DDA0DD'
         };
 
-        // Initialize Office Add-in (only if Office.js is available)
+        // Initialize Office Add-in
         if (typeof Office !== 'undefined') {
             Office.onReady(function(info) {
                 console.log('Office.js loaded successfully');
@@ -59,7 +35,7 @@
                     console.log('Word host detected - Functions ready');
                     isInWord = true;
                     
-                    // Register functions globally for manifest commands
+                    // Register functions globally
                     window.colorizeSelection = colorizeSelection;
                     window.clearFormatting = clearFormatting;
                 } else {
@@ -67,151 +43,144 @@
                 }
             });
         } else {
-            console.log('Office.js not available - running in browser demo mode');
+            console.log('Office.js not available');
         }
 
         // Main colorization function
         function colorizeSelection() {
-            console.log('colorizeSelection function called');
+            console.log('colorizeSelection called');
             
             if (!isInWord) {
-                console.log('Not in Word - cannot colorize');
+                console.log('Not in Word environment');
                 return;
             }
 
             Word.run(function(context) {
-                console.log('Starting Word.run');
-                
-                // Get the current selection
-                const selection = context.document.getSelection();
-                selection.load('text');
-                
-                return context.sync().then(function() {
-                    const text = selection.text;
-                    console.log('Selected text:', text);
+                try {
+                    console.log('Starting Word.run for colorization');
                     
-                    if (!text || text.trim() === '') {
-                        console.log('No text selected');
-                        return;
-                    }
+                    // Get the current selection
+                    const selection = context.document.getSelection();
+                    selection.load('text');
                     
-                    // Apply colorization
-                    applyGraphemePhonemeColoring(context, selection, text);
+                    return context.sync().then(function() {
+                        const text = selection.text;
+                        console.log('Selected text:', text);
+                        
+                        if (!text || text.trim() === '') {
+                            console.log('No text selected');
+                            return context.sync();
+                        }
+                        
+                        // Simple colorization approach
+                        return applySimpleColorization(context, selection, text);
+                    });
                     
-                    return context.sync();
-                }).then(function() {
-                    console.log('Colorization completed successfully');
-                });
-                
+                } catch (error) {
+                    console.error('Error in colorizeSelection:', error);
+                }
             }).catch(function(error) {
-                console.error('Error in colorizeSelection:', error);
+                console.error('Word.run error:', error);
             });
         }
 
         // Clear formatting function
         function clearFormatting() {
-            console.log('clearFormatting function called');
+            console.log('clearFormatting called');
             
             if (!isInWord) {
-                console.log('Not in Word - cannot clear formatting');
+                console.log('Not in Word environment');
                 return;
             }
 
             Word.run(function(context) {
-                const selection = context.document.getSelection();
-                selection.load('text');
-                
-                return context.sync().then(function() {
-                    if (!selection.text || selection.text.trim() === '') {
-                        console.log('No text selected to clear');
-                        return;
-                    }
+                try {
+                    const selection = context.document.getSelection();
+                    selection.load('text');
                     
-                    // Clear font color and formatting
-                    selection.font.color = '#000000';
-                    selection.font.bold = false;
-                    selection.font.highlightColor = null;
+                    return context.sync().then(function() {
+                        if (!selection.text || selection.text.trim() === '') {
+                            console.log('No text selected to clear');
+                            return context.sync();
+                        }
+                        
+                        console.log('Clearing formatting for:', selection.text);
+                        
+                        // Clear font color
+                        selection.font.color = '#000000';
+                        selection.font.bold = false;
+                        
+                        return context.sync().then(function() {
+                            console.log('Formatting cleared successfully');
+                        });
+                    });
                     
-                    return context.sync();
-                }).then(function() {
-                    console.log('Formatting cleared successfully');
-                });
-                
-            }).catch(function(error) {
-                console.error('Error in clearFormatting:', error);
-            });
-        }
-
-        // Apply grapheme-phoneme coloring to text
-        function applyGraphemePhonemeColoring(context, selection, text) {
-            console.log('Applying colorization to:', text);
-            
-            // Split text into words and spaces
-            const parts = text.split(/(\s+)/);
-            let currentRange = selection.getRange();
-            let currentIndex = 0;
-            
-            parts.forEach(function(part) {
-                if (part.trim() === '') {
-                    // Skip whitespace
-                    currentIndex += part.length;
-                    return;
+                } catch (error) {
+                    console.error('Error in clearFormatting:', error);
                 }
-                
-                // Create range for this word
-                const wordRange = selection.getRange();
-                wordRange.start = currentIndex;
-                wordRange.end = currentIndex + part.length;
-                
-                // Apply coloring to the word
-                colorizeWord(wordRange, part.toLowerCase());
-                
-                currentIndex += part.length;
+            }).catch(function(error) {
+                console.error('Word.run error in clearFormatting:', error);
             });
         }
 
-        // Colorize individual word
-        function colorizeWord(range, word) {
-            console.log('Colorizing word:', word);
+        // Apply simple colorization
+        function applySimpleColorization(context, selection, text) {
+            console.log('Applying simple colorization to:', text);
             
-            // Remove punctuation for analysis
-            const cleanWord = word.replace(/[^\w]/g, '');
+            // Find the most prominent grapheme in the text
+            let bestMatch = null;
+            let bestGrapheme = '';
             
-            // Apply colors based on grapheme patterns
-            // Sort by length (longest first) to avoid conflicts
-            const sortedGraphemes = Object.keys(graphemePhonemeMap).sort((a, b) => b.length - a.length);
+            // Check for digraphs first (longer patterns)
+            const digraphs = ['th', 'ch', 'sh', 'wh', 'ph', 'gh', 'ck', 'ng', 'ai', 'ay', 'ea', 'ee', 'ei', 'ie', 'oa', 'oo', 'ou', 'ow', 'ue', 'ui'];
             
-            for (const grapheme of sortedGraphemes) {
-                if (cleanWord.includes(grapheme)) {
-                    const properties = graphemePhonemeMap[grapheme];
-                    
-                    // Apply color
-                    range.font.color = properties.color;
-                    
-                    // Apply bold if specified
-                    if (properties.weight === 'bold') {
-                        range.font.bold = true;
-                    }
-                    
-                    // Only apply the first matching pattern to avoid conflicts
+            for (const grapheme of digraphs) {
+                if (text.toLowerCase().includes(grapheme)) {
+                    bestGrapheme = grapheme;
+                    bestMatch = graphemeColors[grapheme];
                     break;
                 }
+            }
+            
+            // If no digraph found, check vowels
+            if (!bestMatch) {
+                const vowels = ['a', 'e', 'i', 'o', 'u', 'y'];
+                for (const vowel of vowels) {
+                    if (text.toLowerCase().includes(vowel)) {
+                        bestGrapheme = vowel;
+                        bestMatch = graphemeColors[vowel];
+                        break;
+                    }
+                }
+            }
+            
+            if (bestMatch) {
+                console.log('Applying color', bestMatch, 'for grapheme', bestGrapheme);
+                
+                // Apply the color to the entire selection
+                selection.font.color = bestMatch;
+                
+                // Make digraphs bold
+                if (digraphs.includes(bestGrapheme)) {
+                    selection.font.bold = true;
+                }
+                
+                return context.sync().then(function() {
+                    console.log('Colorization completed successfully');
+                });
+            } else {
+                console.log('No matching grapheme found');
+                return context.sync();
             }
         }
 
         // Export functions for global access
-        if (typeof module !== 'undefined' && module.exports) {
-            module.exports = {
-                colorizeSelection: colorizeSelection,
-                clearFormatting: clearFormatting
-            };
-        }
-        
-        // Also add to window for direct access
         if (typeof window !== 'undefined') {
             window.colorizeSelection = colorizeSelection;
             window.clearFormatting = clearFormatting;
         }
+        
+        console.log('Commands script loaded');
     </script>
 </body>
 </html>
