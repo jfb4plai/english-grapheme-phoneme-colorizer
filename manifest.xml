@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp 
+    xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" 
+    xmlns:ov="http://schemas.microsoft.com/office/officeappversions/1.0" 
+    xsi:type="TaskPaneApp">
+
+  <!-- Begin Basic Settings: Add-in metadata, used for all versions of Office unless override provided. -->
+  <Id>b8a2df45-c3ad-4a2b-a5f4-8b1a7c4e9f2d</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>jfb4plai - Dyslexia Support Tools</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  
+  <!-- Display Name is the name that appears in the Office UI -->
+  <DisplayName DefaultValue="English Grapheme-Phoneme Colorizer" />
+  
+  <!-- Description is shown when the user hovers over the add-in icon -->
+  <Description DefaultValue="Visualize English grapheme-phoneme correspondences to support dyslexic readers and improve reading comprehension through color-coding of sound-spelling relationships." />
+  
+  <!-- Icon for your add-in. Used on installation screen and the add-ins dialog. -->
+  <IconUrl DefaultValue="https://jfb4plai.github.io/english-grapheme-phoneme-colorizer/assets/icon-32.png" />
+  <HighResolutionIconUrl DefaultValue="https://jfb4plai.github.io/english-grapheme-phoneme-colorizer/assets/icon-64.png" />
+  
+  <!-- Support URL is the URL that appears when the user clicks "Get Support" -->
+  <SupportUrl DefaultValue="https://github.com/jfb4plai/english-grapheme-phoneme-colorizer/issues" />
+  
+  <!-- Domains that will be allowed when navigating. For example, if you use ShowTaskpane and then have an href link, navigation will only be allowed if the domain is on this list. -->
+  <AppDomains>
+    <AppDomain>https://jfb4plai.github.io</AppDomain>
+  </AppDomains>
+  
+  <!-- End Basic Settings. -->
+  
+  <!-- Begin TaskPane Mode integration. This section is used if there are no VersionOverrides or if the Office client version does not support add-in commands. -->
+  <Hosts>
+    <Host Name="Document" />
+  </Hosts>
+  
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://jfb4plai.github.io/english-grapheme-phoneme-colorizer/taskpane.html" />
+  </DefaultSettings>
+  
+  <!-- End TaskPane Mode integration. -->
+
+  <!-- Begin Add-in Commands Mode integration. -->
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+
+    <!-- The Hosts node is required. -->
+    <Hosts>
+      <!-- Each host can have a different set of commands. -->
+      <!-- Workbook=Excel Document=Word Presentation=PowerPoint -->
+      <Host xsi:type="Document">
+        <!-- Form factor. Currently only DesktopFormFactor is supported. -->
+        <DesktopFormFactor>
+          <!-- "This code enables a customizable message to be displayed when the add-in is loaded successfully upon individual install." -->
+          <GetStarted>
+            <!-- Title of the Getting Started callout. resid points to a ShortString resource -->
+            <Title resid="GetStarted.Title"/>
+            <!-- Description of the Getting Started callout. resid points to a LongString resource -->
+            <Description resid="GetStarted.Description"/>
+            <!-- Point to a url resource which details how the add-in should be used. -->
+            <LearnMoreUrl resid="GetStarted.LearnMoreUrl"/>
+          </GetStarted>
+          
+          <!-- Function file is a HTML page that includes the JavaScript where functions for ExecuteAction will be called. 
+               Think of the FunctionFile as the code behind ExecuteFunction. -->
+          <FunctionFile resid="Commands.Url" />
+
+          <!-- Ribbon XML. -->
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <!-- Use OfficeTab to extend an existing Tab. Use CustomTab to create a new tab. -->
+            <CustomTab id="GraphemePhonemeTab">
+              <Group id="GraphemePhonemeGroup">
+                <Label resid="GraphemePhoneme.GroupLabel" />
+                <Icon>
+                  <bt:Image size="16" resid="Icon.16x16" />
+                  <bt:Image size="32" resid="Icon.32x32" />
+                  <bt:Image size="80" resid="Icon.80x80" />
+                </Icon>
+
+                <!-- Define a control that shows the task pane. -->
+                <Control xsi:type="Button" id="TaskpaneButton">
+                  <Label resid="TaskpaneButton.Label" />
+                  <Supertip>
+                    <Title resid="TaskpaneButton.Label" />
+                    <Description resid="TaskpaneButton.Tooltip" />
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16x16" />
+                    <bt:Image size="32" resid="Icon.32x32" />
+                    <bt:Image size="80" resid="Icon.80x80" />
+                  </Icon>
+                  <!-- This is what happens when the command is triggered (E.g. click on the Ribbon). Supported actions are ExecuteFunction or ShowTaskpane. -->
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>ButtonId1</TaskpaneId>
+                    <!-- Provide a url resource id for the location that will be displayed on the task pane. -->
+                    <SourceLocation resid="Taskpane.Url" />
+                  </Action>
+                </Control>
+
+                <!-- Define a control that calls a JavaScript function. -->
+                <Control xsi:type="Button" id="QuickColorizeButton">
+                  <Label resid="QuickColorizeButton.Label" />
+                  <Supertip>
+                    <Title resid="QuickColorizeButton.Label" />
+                    <Description resid="QuickColorizeButton.Tooltip" />
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="ColorIcon.16x16" />
+                    <bt:Image size="32" resid="ColorIcon.32x32" />
+                    <bt:Image size="80" resid="ColorIcon.80x80" />
+                  </Icon>
+                  <Action xsi:type="ExecuteFunction">
+                    <FunctionName>quickColorizeSelection</FunctionName>
+                  </Action>
+                </Control>
+
+                <!-- Define a control for clearing formatting. -->
+                <Control xsi:type="Button" id="ClearFormattingButton">
+                  <Label resid="ClearFormattingButton.Label" />
+                  <Supertip>
+                    <Title resid="ClearFormattingButton.Label" />
+                    <Description resid="ClearFormattingButton.Tooltip" />
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="ClearIcon.16x16" />
+                    <bt:Image size="32" resid="ClearIcon.32x32" />
+                    <bt:Image size="80" resid="ClearIcon.80x80" />
+                  </Icon>
+                  <Action xsi:type="ExecuteFunction">
+                    <FunctionName>clearFormattingSelection</FunctionName>
+                  </Action>
+                </Control>
+
+              </Group>
+              <Label resid="GraphemePhonemeTab.TabLabel" />
+            </CustomTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+
+    <!-- You can use resources across hosts and form factors. -->
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Icon.16x16" DefaultValue="https://jfb4plai.github.io/english-grapheme-phoneme-colorizer/assets/icon-16.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="https://jfb4plai.github.io/english-grapheme-phoneme-colorizer/assets/icon-32.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="https://jfb4plai.github.io/english-grapheme-phoneme-colorizer/assets/icon-80.png"/>
+        <bt:Image id="ColorIcon.16x16" DefaultValue="https://jfb4plai.github.io/english-grapheme-phoneme-colorizer/assets/color-icon-16.png"/>
+        <bt:Image id="ColorIcon.32x32" DefaultValue="https://jfb4plai.github.io/english-grapheme-phoneme-colorizer/assets/color-icon-32.png"/>
+        <bt:Image id="ColorIcon.80x80" DefaultValue="https://jfb4plai.github.io/english-grapheme-phoneme-colorizer/assets/color-icon-80.png"/>
+        <bt:Image id="ClearIcon.16x16" DefaultValue="https://jfb4plai.github.io/english-grapheme-phoneme-colorizer/assets/clear-icon-16.png"/>
+        <bt:Image id="ClearIcon.32x32" DefaultValue="https://jfb4plai.github.io/english-grapheme-phoneme-colorizer/assets/clear-icon-32.png"/>
+        <bt:Image id="ClearIcon.80x80" DefaultValue="https://jfb4plai.github.io/english-grapheme-phoneme-colorizer/assets/clear-icon-80.png"/>
+      </bt:Images>
+      
+      <bt:Urls>
+        <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://github.com/jfb4plai/english-grapheme-phoneme-colorizer/blob/main/README.md" />
+        <bt:Url id="Commands.Url" DefaultValue="https://jfb4plai.github.io/english-grapheme-phoneme-colorizer/commands.html" />
+        <bt:Url id="Taskpane.Url" DefaultValue="https://jfb4plai.github.io/english-grapheme-phoneme-colorizer/taskpane.html" />
+      </bt:Urls>
+      
+      <!-- ShortStrings max characters==125. -->
+      <bt:ShortStrings>
+        <bt:String id="GetStarted.Title" DefaultValue="Get started with Grapheme-Phoneme Colorizer!" />
+        <bt:String id="GraphemePhoneme.GroupLabel" DefaultValue="Grapheme-Phoneme Tools" />
+        <bt:String id="GraphemePhonemeTab.TabLabel" DefaultValue="Dyslexia Support" />
+        <bt:String id="TaskpaneButton.Label" DefaultValue="Show Colorizer" />
+        <bt:String id="QuickColorizeButton.Label" DefaultValue="Quick Colorize" />
+        <bt:String id="ClearFormattingButton.Label" DefaultValue="Clear Colors" />
+      </bt:ShortStrings>
+      
+      <!-- LongStrings max characters==250. -->
+      <bt:LongStrings>
+        <bt:String id="GetStarted.Description" DefaultValue="Your sample add-in loaded successfully. Go to the HOME tab and click the 'Show Colorizer' button to get started." />
+        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Click to open the Grapheme-Phoneme Colorizer panel with full options." />
+        <bt:String id="QuickColorizeButton.Tooltip" DefaultValue="Instantly colorize selected text using phoneme-based colors." />
+        <bt:String id="ClearFormattingButton.Tooltip" DefaultValue="Remove all grapheme-phoneme color formatting from selected text." />
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+  <!-- End Add-in Commands Mode integration. -->
+
+</OfficeApp>
